@@ -11,31 +11,41 @@ class GameScene extends Phaser.Scene {
         this.playerCanMove = true;
         this.touchingNPC = false;
         this.isDialogVisible = false;
+        
     }
+    
 
     preload() {
         loadAssets(this.load);
     }
 
     create() {
+        // Tentukan batas koordinat
+        this.minX = 100;   // Batas kiri
+        this.maxX = 2650;  // Batas kanan (sesuaikan dengan map)
+        this.minY = 0;   // Batas atas
+        this.maxY = 2050;  // Batas bawah (sesuaikan dengan map)
         this.camera = this.cameras.main;
         createMap(this);
         this.player = createPlayer(window.innerWidth, window.innerHeight, this, "frinky");
         this.npcErin = Erin(this);
         this.setupCollider();
         this.setupInput();
-        this.camera.startFollow(this.player, true, 1, 1);
-        this.camera.setZoom(0.5);
-        this.physics.world.setBounds(0, 0, 10000, 10000);
+        this.camera.startFollow(this.player, true, 0.5, 0.5);
+        this.camera.setBounds(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);
+        this.physics.world.setBounds(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);        
+        // this.camera.setZoom(0.5);
         this.dialog = {
             box: this.add.rectangle(400, 550, 700, 100, 0x000000, 0.8).setOrigin(0.5).setVisible(false),
             text: this.add.text(150, 530, "", { fontSize: "18px", fill: "#ffffff" }).setVisible(false),
         };
         this.npcErin.setVelocityX(50);
+        console.log(`Window X : ${window.innerWidth}, Window Y : ${window.innerHeight}`);
 
     }
 
     update() {
+        console.log(`Player X : ${this.player.x}, Player Y : ${this.player.y}`);
         if (this.touchingNPC && Phaser.Input.Keyboard.JustDown(this.keySpace)) {
             if (!this.isDialogVisible) {
                 showDialog(this.dialog, this.npcErin, "Halo, Namaku Erin! Ada yang bisa kubantu?");
