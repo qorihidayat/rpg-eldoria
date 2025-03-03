@@ -35,10 +35,34 @@ class GameScene extends Phaser.Scene {
         this.camera.setBounds(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);
         this.physics.world.setBounds(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);        
         // this.camera.setZoom(0.5);
+
+        const dialogWidth = this.camera.width * 0.8;
+        const dialogHeight = 200;
+        const borderRadius = 20; // Atur seberapa melengkung sudutnya
+
+        // Buat grafik untuk rounded rectangle
+        const graphics = this.add.graphics();
+        graphics.fillStyle(0x000000, 1); // Warna hitam dengan transparansi
+        graphics.fillRoundedRect(
+            this.camera.centerX - dialogWidth / 2, 
+            this.camera.centerY + this.camera.height / 2 - dialogHeight / 2, 
+            dialogWidth, 
+            dialogHeight, 
+            borderRadius
+        );
+        graphics.setScrollFactor(0).setDepth(10).setVisible(false); // Agar tidak bergerak dengan kamera
+
         this.dialog = {
-            box: this.add.rectangle(400, 550, 700, 100, 0x000000, 0.8).setOrigin(0.5).setVisible(false),
-            text: this.add.text(150, 530, "", { fontSize: "18px", fill: "#ffffff" }).setVisible(false),
+            box: graphics, // Menggunakan graphics sebagai box
+            text: this.add.text(
+                this.camera.centerX - dialogWidth / 2 + 20, // Mulai dari kiri box
+                this.camera.centerY + this.camera.height / 2 - dialogHeight / 2 + 20, // Sedikit ke atas agar rapi
+                "", 
+                { fontSize: "18px", fill: "#ffffff", wordWrap: { width: dialogWidth - 40 } } // Word wrap sesuai lebar box
+            ).setScrollFactor(0).setDepth(11).setVisible(false),
+            characterImage: this.add.image(0, 0, "frinky").setVisible(false).setScale(5).setDepth(9)
         };
+
         this.npcErin.setVelocityX(50);
         console.log(`Window X : ${window.innerWidth}, Window Y : ${window.innerHeight}`);
 
@@ -48,10 +72,11 @@ class GameScene extends Phaser.Scene {
         console.log(`Player X : ${this.player.x}, Player Y : ${this.player.y}`);
         if (this.touchingNPC && Phaser.Input.Keyboard.JustDown(this.keySpace)) {
             if (!this.isDialogVisible) {
-                showDialog(this.dialog, this.npcErin, "Halo, Namaku Erin! Ada yang bisa kubantu?");
+                showDialog(this.dialog, this.npcErin, this.camera, "Halo, Namaku Erin! Ada yang bisa kubantu?");
                 this.player.setVelocity(0, 0);
                 this.playerCanMove = false; 
             } else {
+                this.dialog.setText("");
                 hideDialog(this.dialog, this.npcErin);  
                 this.playerCanMove = true;
             }
