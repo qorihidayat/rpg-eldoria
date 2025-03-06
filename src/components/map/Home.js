@@ -6,9 +6,9 @@ const createMap = (scene) => {
 
     scene.ground = map.createLayer("Ground", tiles, 100, 0);
     console.log("Ground Layer Position:");
-console.log("X:", scene.ground.x, "Y:", scene.ground.y);
-console.log("Width (tiles):", map.width, "Height (tiles):", map.height);
-console.log("Width (pixels):", map.widthInPixels, "Height (pixels):", map.heightInPixels);
+    console.log("X:", scene.ground.x, "Y:", scene.ground.y);
+    console.log("Width (tiles):", map.width, "Height (tiles):", map.height);
+    console.log("Width (pixels):", map.widthInPixels, "Height (pixels):", map.heightInPixels);
     scene.object = map.createLayer("Object", tiles, 0, 0);
     scene.pagar = map.createLayer("Pagar", tiles, 0, 0);
     scene.groundHouses = map.createLayer("Ground_House", tilesHouse, 100, 0);

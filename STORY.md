@@ -26,6 +26,6 @@ Bisakah kamu bertahan melawan serangan monster setiap lima hari? Bisakah kamu me
 
 
 **SOURCE**
-https://retro-sprite-creator.nihey.org/character/
+https://retro-sprite-creator.nihey.org
 
 https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/
