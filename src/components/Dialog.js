@@ -11,13 +11,13 @@ export const showDialog = (dialog, speaker, camera, text,npcName, isPlayer = fal
     // Hitung posisi karakter berdasarkan teks
     const characterX = isPlayer ? window.innerWidth / 5: window.innerWidth / 1.3;
     const characterY = window.innerHeight - 150;
+    console.log(`Posisi karakter X = ${characterX}, Posisi karakter Y = ${characterY}`);
+
     
     // Set gambar karakter
     dialog.characterImage.setTexture(isPlayer ? "frinky" : npcName);
     dialog.characterImage.setPosition(characterX, characterY).setAlpha(1).setVisible(true);
-    console.log(`Posisi karakter X = ${characterX}, Posisi karakter Y = ${characterY}`);
-    console.log(`Posisi Camera X = ${camera.centerX}, Posisi Camera Y = ${camera.centerY}`);
-    console.log(`Posisi Window X = ${window.innerWidth}, Posisi Window Y = ${window.innerHeight}`);
+
     
 
     dialogTypingInterval = setInterval(() => {

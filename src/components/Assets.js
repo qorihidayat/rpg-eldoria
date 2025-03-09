@@ -3,7 +3,8 @@ import frinky from "/src/assets/frinky.png";
 import sankara from "/src/assets/sankara.png";
 import tileset from "/src/assets/tile/tileset.png";
 import houses from "/src/assets/Houses.png";
-import arrow from "/src/assets/arrow.png";
+import leftArrow from "/src/assets/left_arrow.png";
+import blackbox from "/src/assets/blackbtn.png";
 import tilemap from "/src/assets/tile/tilemap1.json";
 
 
@@ -14,7 +15,8 @@ const loadAssets = (scene) =>{
        scene.tilemapTiledJSON('home', tilemap);
        scene.image('tiles', tileset);
        scene.image('Houses', houses);
-       scene.image('arrow', arrow);
+       scene.image('left_arrow', leftArrow);
+       scene.image('blackbox', blackbox);
 }
 
 export default loadAssets;

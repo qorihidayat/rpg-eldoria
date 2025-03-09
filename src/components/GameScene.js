@@ -37,37 +37,85 @@ class GameScene extends Phaser.Scene {
         this.physics.world.setBounds(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);        
         // this.camera.setZoom(0.5);
         this.setupDialogBox();
-        console.log(`Window X : ${window.innerWidth}, Window Y : ${window.innerHeight}`);
-        this.leftArrow = this.add.image(window.innerWidth / 1.2, 550, 'arrow').setInteractive().setScrollFactor(0).setScale(0.8);
-    
-        this.leftArrow.on('pointerdown', () => {
-            this.player.setVelocityX(-200);
-        });
+        if (window.innerWidth < 500) {
+            this.buttonWalk();      
+        }
+
+        console.log(`Posisi Camera X = ${this.camera.centerX}, Posisi Camera Y = ${this.camera.centerY}`);
+        console.log(`Posisi Window X = ${window.innerWidth}, Posisi Window Y = ${window.innerHeight}`);
     }
 
     update() {
         // console.log(`Player X : ${this.player.x}, Player Y : ${this.player.y}`);
-        if (this.touchingNPC && Phaser.Input.Keyboard.JustDown(this.keySpace)) {
-            if (!this.isDialogVisible) {
-                showDialog(this.dialog, this.npcSankara, this.camera, `Halo, Namaku Sankara! Ada yang bisa kubantu?`, "sankara");
-                this.player.setVelocity(0, 0);
-                this.npcSankara.setVelocity(0,0);
-                this.playerCanMove = false;
-            } else {
-                this.dialog.setText("");
+        if (window.innerWidth < 500) {
+            if (this.isHoldBlackBtn && !this.isHandlingDialog) {
+                this.isHandlingDialog = true; // Mencegah eksekusi berulang
+                if (this.touchingNPC && !this.isDialogVisible) {
+                    showDialog(this.dialog, this.npcSankara, this.camera, `Halo, Namaku Sankara! Ada yang bisa kubantu?`, "sankara");
+                    this.isDialogVisible = true;
+                    this.player.setVelocity(0, 0);
+                    this.npcSankara.setVelocity(0, 0);
+                    this.playerCanMove = false;
+                } else if (this.isDialogVisible) {
+                    hideDialog(this.dialog, this.npcSankara);
+                    this.isDialogVisible = false;
+                    this.playerCanMove = true;
+                    this.npcSankara.setVelocityX(50);
+                    this.npcSankara.anims.play(`right_${this.npcSankara.texture.key}`, true);
+                }
+        
+                setTimeout(() => {
+                    this.isHandlingDialog = false; // Reset setelah delay
+                }, 300); // Delay 300ms agar tidak langsung tertutup lagi
+            }
+        }else{
+            if (this.touchingNPC && Phaser.Input.Keyboard.JustDown(this.keySpace)) {
+                if (!this.isDialogVisible) {
+                    showDialog(this.dialog, this.npcSankara, this.camera, `Halo, Namaku Sankara! Ada yang bisa kubantu?`, "sankara");
+                    this.isDialogVisible = true;
+                    this.player.setVelocity(0, 0);
+                    this.npcSankara.setVelocity(0,0);
+                    this.playerCanMove = false;
+                }else {
+                    this.dialog.setText("");
+                    hideDialog(this.dialog, this.npcSankara);
+                    this.isDialogVisible = false;
+                    this.npcSankara.setVelocityX(50);
+                    this.npcSankara.anims.play(`right_${this.npcSankara.texture.key}`, true);
+                    this.playerCanMove = true;
+                }
+            } else if (Phaser.Input.Keyboard.JustDown(this.keyEsc)) {
                 hideDialog(this.dialog, this.npcSankara);
+                this.isDialogVisible = false;
+                this.playerCanMove = true;
                 this.npcSankara.setVelocityX(50);
                 this.npcSankara.anims.play(`right_${this.npcSankara.texture.key}`, true);
-                this.playerCanMove = true;
             }
-        } else if (Phaser.Input.Keyboard.JustDown(this.keyEsc)) {
-            hideDialog(this.dialog, this.npcSankara);
-            this.playerCanMove = true;
-            this.npcSankara.setVelocityX(50);
-                this.npcSankara.anims.play(`right_${this.npcSankara.texture.key}`, true);
         }
 
-        if (this.playerCanMove) {
+        // console.log("isdialog visible = "+this.isDialogVisible);
+        console.log("blackbtn = "+this.isHoldBlackBtn);
+        
+        
+
+        if (window.innerWidth < 500 && this.playerCanMove) {
+            if (this.isHoldingLeft) {
+                this.player.setVelocityX(-100);
+                this.player.anims.play(`left_${this.player.texture.key}`, true);
+            } else if (this.isHoldingRight) {
+                this.player.setVelocityX(100);
+                this.player.anims.play(`right_${this.player.texture.key}`, true);
+            }else if (this.isHoldingTop) {
+                this.player.setVelocityY(-100);
+                this.player.anims.play(`top_${this.player.texture.key}`, true);
+            }else if (this.isHoldingBot) {
+                this.player.setVelocityY(100);
+                this.player.anims.play(`bot_${this.player.texture.key}`, true);
+            }else {
+                this.player.setVelocity(0, 0);
+                this.player.anims.play(`turn_${this.player.texture.key}`, true);
+            }
+        }else if (this.playerCanMove) {
             setWalkRPGVersion(this);
         }
 
@@ -79,6 +127,10 @@ class GameScene extends Phaser.Scene {
             this.npcSankaraDirection = 1;
             this.npcSankara.setVelocityX(50);
             this.npcSankara.anims.play(`right_${this.npcSankara.texture.key}`, true);
+        }
+
+        if (this.touchingSchool && this.isHoldBlackBtn || this.touchingSchool && Phaser.Input.Keyboard.JustDown(this.keySpace)) {
+            this.scene.start('Sekolah');
         }
     
         this.touchingNPC = false;
@@ -93,6 +145,7 @@ class GameScene extends Phaser.Scene {
         this.keyShift = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this.keyL = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
     }
 
     setupCollider(){
@@ -100,7 +153,9 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.object);
         this.physics.add.collider(this.npcSankara, this.pagar);
         this.physics.add.collider(this.player, this.houses);
-        this.physics.add.collider(this.player, this.pintuSekolah, () => console.log("Player menyentuh pintu sekolah!"));
+        this.physics.add.collider(this.player, this.pintuSekolah, () => {
+            this.touchingSchool = true;
+        });
         this.physics.add.collider(this.player, this.pintuRumah, () => console.log("Player menyentuh pintu rumah!"));
         this.physics.add.collider(this.player, this.npcSankara, () => {
             this.touchingNPC = true;
@@ -135,6 +190,36 @@ class GameScene extends Phaser.Scene {
             ).setScrollFactor(0).setDepth(11).setVisible(false),
             characterImage: this.add.image(0, 0, "frinky").setVisible(false).setScale(5).setDepth(9).setScrollFactor(0)
         };
+    }
+
+    buttonWalk(){
+        this.isHoldingLeft = false;
+        this.isHoldingRight = false;
+        this.isHoldingTop = false;
+        this.isHoldingBot = false;
+        this.isHoldBlackBtn  = false;
+
+        this.blackBtn = this.add.image(window.innerWidth / 5, window.innerHeight / 1.2, 'blackbox').setInteractive().setScrollFactor(0).setScale(0.2);
+        this.leftArrow = this.add.image(window.innerWidth / 1.7, window.innerHeight / 1.2, 'left_arrow').setInteractive().setScrollFactor(0).setScale(0.13);
+        this.rightArrow = this.add.image(window.innerWidth / 1.2, window.innerHeight / 1.2, 'left_arrow').setInteractive().setScrollFactor(0).setScale(0.13).setRotation(3);
+        this.topArrow = this.add.image(window.innerWidth / 1.4, window.innerHeight / 1.3, 'left_arrow').setInteractive().setScrollFactor(0).setScale(0.13).setRotation(1.5);
+        this.botArrow = this.add.image(window.innerWidth / 1.4, window.innerHeight / 1.12, 'left_arrow').setInteractive().setScrollFactor(0).setScale(0.13).setRotation(4.7);
+
+        // this.blackBtn.on('pointerdown', ()=> this.isHoldBlackBtn = true);
+        const setButtonState = (button, stateVar)=>{
+            button.on('pointerdown', () => {this[stateVar] = true});
+            button.on('pointerup', () => {this[stateVar] = false});
+            button.on('pointerout', () => {this[stateVar] = false});
+        }
+
+        setButtonState(this.leftArrow, 'isHoldingLeft');
+        setButtonState(this.rightArrow, 'isHoldingRight');
+        setButtonState(this.topArrow, 'isHoldingTop');
+        setButtonState(this.botArrow, 'isHoldingBot');
+        setButtonState(this.blackBtn, 'isHoldBlackBtn');
+        // if (this.touchingNPC) {
+        //     this.blackBtn.on('pointerdown',() => this.isHoldBlackBtn = !this.isHoldBlackBtn);
+        // }
     }
 }
 

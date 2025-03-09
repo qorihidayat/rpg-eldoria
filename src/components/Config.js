@@ -1,4 +1,5 @@
 import GameScene from "./GameScene";
+import Sekolah from "./Scene/Sekolah";
 
 const Config = {
     type: Phaser.AUTO,
@@ -12,7 +13,7 @@ const Config = {
             debug: true
         },
     },
-    scene: [ GameScene ]
+    scene: [ GameScene, Sekolah ]
 };
 
 export default Config;
